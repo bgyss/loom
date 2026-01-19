@@ -8,6 +8,8 @@ let
   tools = pkgs.extend (import ./tools/pkgs);
 in
 {
+  # Disable cachix until trusted-users is configured
+  cachix.enable = false;
 
   # https://devenv.sh/basics/
   env.GREET = "devenv";
@@ -25,10 +27,9 @@ in
   
 
   # https://devenv.sh/packages/
-  packages = [ 
+  packages = [
     pkgs.age
     pkgs.btop
-    pkgs.chromium    # Headless browser testing
     pkgs.clang
     pkgs.zlib         # Required by libz-sys (git2, etc.)
     pkgs.gettext      # For msgfmt (i18n .po → .mo compilation)
@@ -50,6 +51,7 @@ in
     pkgs.skopeo
     pkgs.sops
     pkgs.ssh-to-age
+    pkgs.playwright-test  # Headless browser testing (cross-platform)
   ];
   
   # Shell aliases and scripts for cargo2nix workflow
