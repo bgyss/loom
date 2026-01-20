@@ -5032,6 +5032,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "loom-context"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "loom-context-core",
+ "proptest",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "loom-context-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
 name = "loom-crash"
 version = "0.1.0"
 dependencies = [
@@ -5516,6 +5545,23 @@ dependencies = [
  "thiserror 1.0.69",
  "toml 0.8.23",
  "tracing",
+]
+
+[[package]]
+name = "loom-server-context"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "loom-context-core",
+ "proptest",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
