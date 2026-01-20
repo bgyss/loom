@@ -18,6 +18,25 @@ Design documentation for Loom, an AI-powered coding agent in Rust.
 | [streaming.md](./streaming.md) | [loom-llm-service](../crates/loom-llm-service/) | SSE streaming for real-time LLM responses |
 | [error-handling.md](./error-handling.md) | [loom-core](../crates/loom-core/) | Error types using `thiserror` |
 
+## Multi-Agent Coordination
+
+Autonomous multi-agent system for running coding agents at scale for extended periods (weeks).
+
+| Spec | Code | Purpose |
+|------|------|---------|
+| [multi-agent-coordination-system.md](./multi-agent-coordination-system.md) | [loom-multi-agent](../crates/loom-multi-agent/) | Hierarchical planner/worker architecture for scaling autonomous coding |
+| [context-management-system.md](./context-management-system.md) | [loom-context](../crates/loom-context/) | Drift prevention, bounded resources, verifiable feedback loops |
+| [task-signaling-system.md](./task-signaling-system.md) | [loom-events](../crates/loom-events/) | Event-driven planner wake-up on task completion |
+
+**Key capabilities:**
+- Hierarchical coordination (planners create tasks, workers execute)
+- Event-driven planner wake-up when tasks complete
+- Context drift prevention without periodic fresh starts
+- Bounded resource awareness and dynamic strategy adaptation
+- Verifiable feedback loops grounded in executable reality
+
+**Research basis:** [Cursor blog on scaling agents](https://cursor.com/blog/scaling-agents), [CodeAdapt paper](https://arxiv.org/html/2510.20909v1)
+
 ## Observability Suite
 
 Loom's integrated observability platform: analytics, crash tracking, cron monitoring, and session health.
