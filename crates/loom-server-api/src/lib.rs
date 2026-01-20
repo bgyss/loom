@@ -12,6 +12,7 @@ pub mod invitations;
 pub mod jobs;
 pub mod maintenance;
 pub mod mirrors;
+pub mod multi_agent;
 pub mod orgs;
 pub mod protection;
 pub mod repos;
@@ -121,4 +122,10 @@ pub use weaver::{
 pub use webhooks::{
 	CreateWebhookRequest, ListWebhooksResponse, PayloadFormatApi, WebhookErrorResponse,
 	WebhookResponse, WebhookSuccessResponse,
+};
+pub use multi_agent::{
+	CheckpointResponse, CreateCheckpointRequest, CreateProjectRequest, ListProjectRunsResponse,
+	ListTasksQuery, ListTasksResponse, ListWorkersResponse, MultiAgentErrorResponse,
+	MultiAgentSuccessResponse, ProjectConfigRequest, ProjectEvent, ProjectMetricsResponse,
+	ProjectRunResponse, TaskResponse, WorkerResponse,
 };

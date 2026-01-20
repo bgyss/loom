@@ -73,6 +73,10 @@ members = [
 	"crates/loom-server-crash",
 	"crates/loom-sessions-core",
 	"crates/loom-server-sessions",
+	"crates/loom-multi-agent-core",
+	"crates/loom-multi-agent-events",
+	"crates/loom-multi-agent",
+	"crates/loom-server-multi-agent",
 	]
 
 [workspace.package]

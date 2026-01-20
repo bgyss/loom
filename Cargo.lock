@@ -5151,6 +5151,52 @@ dependencies = [
 ]
 
 [[package]]
+name = "loom-multi-agent"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "loom-multi-agent-core",
+ "loom-multi-agent-events",
+ "loom-server-multi-agent",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-test",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "loom-multi-agent-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "loom-multi-agent-events"
+version = "0.1.0"
+dependencies = [
+ "loom-multi-agent-core",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-test",
+ "tracing",
+]
+
+[[package]]
 name = "loom-redact"
 version = "0.1.0"
 dependencies = [
@@ -5802,6 +5848,26 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "utoipa",
+]
+
+[[package]]
+name = "loom-server-multi-agent"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "loom-multi-agent-core",
+ "loom-multi-agent-events",
+ "proptest",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-test",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
