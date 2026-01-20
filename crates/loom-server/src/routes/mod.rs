@@ -26,6 +26,7 @@ pub mod health;
 pub mod invitations;
 pub mod maintenance;
 pub mod mirrors;
+pub mod multi_agent;
 pub mod orgs;
 pub mod protection;
 pub mod repos;
@@ -66,6 +67,7 @@ pub use loom_server_api::threads::*;
 pub use loom_server_api::users::*;
 pub use loom_server_api::weaver::*;
 pub use loom_server_api::webhooks::*;
+pub use loom_server_api::multi_agent::*;
 
 // Re-export route-specific items not in loom-server-api
 pub use analytics::AnalyticsMergeAuditHook;

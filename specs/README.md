@@ -20,20 +20,31 @@ Design documentation for Loom, an AI-powered coding agent in Rust.
 
 ## Multi-Agent Coordination
 
-Autonomous multi-agent system for running coding agents at scale for extended periods (weeks).
+Autonomous multi-agent system for running 10-100+ coding agents on a single codebase for extended periods (weeks).
 
 | Spec | Code | Purpose |
 |------|------|---------|
-| [multi-agent-coordination-system.md](./multi-agent-coordination-system.md) | [loom-multi-agent](../crates/loom-multi-agent/) | Hierarchical planner/worker architecture for scaling autonomous coding |
-| [context-management-system.md](./context-management-system.md) | [loom-context](../crates/loom-context/) | Drift prevention, bounded resources, verifiable feedback loops |
-| [task-signaling-system.md](./task-signaling-system.md) | [loom-events](../crates/loom-events/) | Event-driven planner wake-up on task completion |
+| [multi-agent-coordination-system.md](./multi-agent-coordination-system.md) | [loom-multi-agent](../crates/loom-multi-agent/) | Orchestrator, Domain Planners, Workers, Judge Agent |
+| [context-management-system.md](./context-management-system.md) | — | Drift prevention, bounded resources, verifiable feedback loops |
+| [task-signaling-system.md](./task-signaling-system.md) | [loom-multi-agent-events](../crates/loom-multi-agent-events/) | Event-driven planner wake-up on task completion |
+
+**Implemented crates:**
+
+| Crate | Purpose |
+|-------|---------|
+| [loom-multi-agent-core](../crates/loom-multi-agent-core/) | Core types: Task, TaskStatus, Domain, ProjectState, Verdict, etc. |
+| [loom-multi-agent-events](../crates/loom-multi-agent-events/) | EventBus with broadcast channels, TaskEvent, PlannerEvent |
+| [loom-server-multi-agent](../crates/loom-server-multi-agent/) | Repository, TaskQueue with priority/dependencies, FileOwnershipManager |
+| [loom-multi-agent](../crates/loom-multi-agent/) | Orchestrator, DomainPlanner, Worker, JudgeAgent, WorkerPool |
 
 **Key capabilities:**
-- Hierarchical coordination (planners create tasks, workers execute)
-- Event-driven planner wake-up when tasks complete
-- Context drift prevention without periodic fresh starts
-- Bounded resource awareness and dynamic strategy adaptation
-- Verifiable feedback loops grounded in executable reality
+- Hierarchical coordination: Orchestrator → Domain Planners → Workers → Judge
+- Event-driven planner wake-up when tasks complete (no polling)
+- Task queue with priority ordering and dependency resolution
+- File ownership to prevent worker conflicts
+- Role-based model selection (exploration vs implementation vs review)
+- Checkpoint/restore for long-running projects
+- Real-time SSE event streaming for UI updates
 
 **Research basis:** [Cursor blog on scaling agents](https://cursor.com/blog/scaling-agents), [CodeAdapt paper](https://arxiv.org/html/2510.20909v1)
 

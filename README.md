@@ -35,6 +35,7 @@ loom/
 │   ├── loom-llm-*/          # LLM provider integrations
 │   ├── loom-auth*/          # Authentication and authorization
 │   ├── loom-tui-*/          # Terminal UI components
+│   ├── loom-multi-agent*/   # Multi-agent coordination system
 │   └── ...                  # Many more specialized crates
 ├── web/
 │   └── loom-web/            # Svelte 5 web frontend
@@ -47,6 +48,7 @@ loom/
 | Component | Description |
 |-----------|-------------|
 | **Core Agent** | State machine for conversation flow and tool orchestration |
+| **Multi-Agent System** | Hierarchical coordination for 10-100+ concurrent agents on a single codebase |
 | **LLM Proxy** | Server-side proxy architecture - API keys never leave the server |
 | **Tool System** | Registry and execution framework for agent capabilities |
 | **Weaver** | Remote execution environments via Kubernetes pods |
@@ -70,6 +72,52 @@ Loom uses a server-side proxy architecture for all LLM interactions:
 ```
 
 API keys are stored server-side only. Clients communicate through the proxy.
+
+### Multi-Agent Coordination
+
+The multi-agent system enables 10-100+ concurrent agents to work on a single codebase for extended periods:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Orchestrator                             │
+│  (Singleton coordinator - manages project state & lifecycle)    │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                ┌───────────────┼───────────────┐
+                ▼               ▼               ▼
+        ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+        │   Domain    │ │   Domain    │ │   Domain    │
+        │   Planner   │ │   Planner   │ │   Planner   │
+        │  (backend)  │ │ (frontend)  │ │   (infra)   │
+        └─────────────┘ └─────────────┘ └─────────────┘
+                │               │               │
+                ▼               ▼               ▼
+        ┌─────────────────────────────────────────────┐
+        │              Task Queue                      │
+        │  (Priority ordering, dependency resolution)  │
+        └─────────────────────────────────────────────┘
+                                │
+        ┌───────────┬───────────┼───────────┬───────────┐
+        ▼           ▼           ▼           ▼           ▼
+    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+    │Worker 1│ │Worker 2│ │Worker 3│ │Worker 4│ │Worker N│
+    └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+                                │
+                                ▼
+                        ┌─────────────┐
+                        │    Judge    │
+                        │    Agent    │
+                        │ (Evaluates) │
+                        └─────────────┘
+```
+
+**Crates:**
+- `loom-multi-agent-core` - Core types (Task, Domain, Verdict, etc.)
+- `loom-multi-agent-events` - Event bus for planner wake-up
+- `loom-server-multi-agent` - Repository, task queue, file ownership
+- `loom-multi-agent` - Agent implementations
+
+See [specs/multi-agent-coordination-system.md](specs/multi-agent-coordination-system.md) for the full design.
 
 ## Building
 
