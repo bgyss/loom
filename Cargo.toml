@@ -81,7 +81,6 @@ members = [
 	"crates/loom-context",
 	"crates/loom-server-context",
 	]
-
 [workspace.package]
 version = "0.1.0"
 authors = ["Geoffrey Huntley"]
@@ -186,6 +185,9 @@ loom-crash = { path = "crates/loom-crash" }
 loom-server-crash = { path = "crates/loom-server-crash" }
 loom-sessions-core = { path = "crates/loom-sessions-core" }
 loom-server-sessions = { path = "crates/loom-server-sessions" }
+loom-context-core = { path = "crates/loom-context-core" }
+loom-context = { path = "crates/loom-context" }
+loom-server-context = { path = "crates/loom-server-context" }
 loom-analytics = { path = "crates/loom-analytics" }
 loom-server-analytics = { path = "crates/loom-server-analytics" }
 loom-common-http = { path = "crates/loom-common-http" }

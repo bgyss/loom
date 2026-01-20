@@ -21,7 +21,7 @@ pub use loom_server_db::{
 	ThreadSearchHit, UserRepository,
 };
 
-/// Run all database migrations (001-035).
+/// Run all database migrations (001-036).
 ///
 /// # Arguments
 /// * `pool` - SQLite connection pool
@@ -390,6 +390,16 @@ pub async fn run_migrations(pool: &SqlitePool) -> Result<(), ServerError> {
 
 	let m35 = include_str!("../../migrations/035_sessions.sql");
 	for stmt in m35.split(';').filter(|s| !s.trim().is_empty()) {
+		if let Err(e) = sqlx::query(stmt).execute(pool).await {
+			let msg = e.to_string();
+			if !msg.contains("already exists") && !msg.contains("duplicate column") {
+				return Err(e.into());
+			}
+		}
+	}
+
+	let m36 = include_str!("../../migrations/036_context_management.sql");
+	for stmt in m36.split(';').filter(|s| !s.trim().is_empty()) {
 		if let Err(e) = sqlx::query(stmt).execute(pool).await {
 			let msg = e.to_string();
 			if !msg.contains("already exists") && !msg.contains("duplicate column") {
