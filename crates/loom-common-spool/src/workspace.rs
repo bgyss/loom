@@ -216,6 +216,7 @@ pub fn operation_id_to_spool(id: &OperationId) -> SpoolOperationId {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use std::fs;
 	use tempfile::TempDir;
 
 	#[test]
@@ -231,7 +232,9 @@ mod tests {
 
 		// Reopen the workspace
 		let ws = SpoolWorkspace::open(path).expect("open should succeed");
-		assert_eq!(ws.workspace_root(), path);
+		let expected = fs::canonicalize(path).unwrap();
+		let actual = fs::canonicalize(ws.workspace_root()).unwrap();
+		assert_eq!(actual, expected);
 	}
 
 	#[test]

@@ -39,8 +39,6 @@ prometheus = "0.13"
 # Axum for health endpoint
 axum = "0.7"
 
-# eBPF userspace library
-aya = "0.13"
 
 # Cryptographic hashing
 sha2 = "0.10"
@@ -55,6 +53,10 @@ loom-redact = { path = "../loom-redact" }
 [features]
 default = ["ebpf"]
 ebpf = []
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# eBPF userspace library (Linux-only)
+aya = "0.13"
 
 [dev-dependencies]
 proptest = { workspace = true }

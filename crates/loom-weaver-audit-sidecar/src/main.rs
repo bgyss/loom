@@ -11,6 +11,7 @@ mod event_processor;
 mod events;
 mod filter;
 mod health;
+#[cfg(all(feature = "ebpf", target_os = "linux"))]
 mod loader;
 mod metrics;
 
@@ -30,7 +31,7 @@ use crate::config::Config;
 use crate::event_processor::{EventProcessor, EventProcessorConfig};
 use crate::events::WeaverAuditEvent;
 use crate::health::{health_router, HealthState};
-#[cfg(feature = "ebpf")]
+#[cfg(all(feature = "ebpf", target_os = "linux"))]
 use crate::loader::EbpfAuditLoader;
 use crate::metrics::Metrics;
 
@@ -191,7 +192,7 @@ async fn main() -> Result<()> {
 		}
 	});
 
-	#[cfg(feature = "ebpf")]
+	#[cfg(all(feature = "ebpf", target_os = "linux"))]
 	let ebpf_loaded = match EbpfAuditLoader::new() {
 		Ok(loader) => {
 			let attached = loader.attached_count();
@@ -234,9 +235,13 @@ async fn main() -> Result<()> {
 		}
 	};
 
-	#[cfg(not(feature = "ebpf"))]
+	#[cfg(any(not(feature = "ebpf"), not(target_os = "linux")))]
 	let ebpf_loaded = {
-		info!("eBPF feature not enabled, running in stub mode");
+		if !cfg!(target_os = "linux") {
+			info!("eBPF not supported on this platform, running in stub mode");
+		} else {
+			info!("eBPF feature not enabled, running in stub mode");
+		}
 		health_state.set_ebpf_status(0, 0).await;
 		false
 	};
