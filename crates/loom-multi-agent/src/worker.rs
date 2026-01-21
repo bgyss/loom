@@ -149,6 +149,7 @@ impl<R: MultiAgentRepository + 'static> Worker<R> {
 			commit_sha: None,
 			verifications: Vec::new(),
 			context_snapshot: Default::default(),
+			unblocked_tasks: Vec::new(),
 		};
 
 		info!("Task {} completed in {}ms", task.id, duration_ms);

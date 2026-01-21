@@ -109,6 +109,7 @@ mod tests {
 				error: None,
 			}],
 			context_snapshot: Default::default(),
+			unblocked_tasks: Vec::new(),
 		};
 
 		let verdict = judge.evaluate(&completion).await.unwrap();
@@ -140,6 +141,7 @@ mod tests {
 				error: Some("Test failed".to_string()),
 			}],
 			context_snapshot: Default::default(),
+			unblocked_tasks: Vec::new(),
 		};
 
 		let verdict = judge.evaluate(&completion).await.unwrap();

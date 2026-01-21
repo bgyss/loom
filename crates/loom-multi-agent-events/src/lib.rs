@@ -13,13 +13,22 @@
 //! - [`PlannerEvent`] - Events that wake up planners
 //! - [`EventSubscription`] - Filtered event subscription
 
+pub mod backpressure;
 pub mod bus;
 pub mod events;
+#[cfg(feature = "persistence")]
+pub mod persistence;
 pub mod subscription;
 
-pub use bus::EventBus;
-pub use events::{OrchestratorEvent, PlannerEvent, TaskEvent, WorkerEvent};
-pub use subscription::{EventFilter, EventSubscription};
+pub use backpressure::{BackpressureController, BackpressureDecision, BackpressureThresholds};
+pub use bus::{EventBus, EventBusMetrics, SharedEventBus};
+pub use events::{
+	DependencyResolvedEvent, EventPriority, OrchestratorEvent, PlannerEvent, TaskEvent,
+	TaskEventType, WakeUpContext, WorkerEvent,
+};
+#[cfg(feature = "persistence")]
+pub use persistence::{EventHistoryQuery, EventHistoryResult, EventPersistence, StoredEvent};
+pub use subscription::{EventFilter, EventSubscription, EventType};
 
 /// Result type for event operations.
 pub type Result<T> = std::result::Result<T, EventError>;

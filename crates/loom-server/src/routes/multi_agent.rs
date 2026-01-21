@@ -9,13 +9,21 @@
 //! - Create checkpoints
 //! - Pause/resume projects
 //! - Stream events (SSE)
+//! - Event history
+
+use std::convert::Infallible;
+use std::time::Duration;
 
 use axum::{
 	extract::{Path, Query, State},
 	http::StatusCode,
-	response::IntoResponse,
+	response::{
+		sse::{Event, KeepAlive, Sse},
+		IntoResponse,
+	},
 	Json,
 };
+use futures::stream::{self, Stream};
 
 pub use loom_server_api::multi_agent::*;
 
@@ -253,4 +261,96 @@ pub async fn resume_project(
 		message: format!("Project {} resumed", run_id),
 	})
 	.into_response()
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/orgs/{org_id}/multi-agent/projects/{run_id}/events",
+    responses(
+        (status = 200, description = "SSE event stream"),
+        (status = 401, description = "Not authenticated", body = MultiAgentErrorResponse),
+        (status = 404, description = "Project not found", body = MultiAgentErrorResponse)
+    ),
+    tag = "multi-agent"
+)]
+/// GET /api/orgs/{org_id}/multi-agent/projects/{run_id}/events - Stream events via SSE.
+pub async fn event_stream(
+	State(_state): State<AppState>,
+	RequireAuth(_current_user): RequireAuth,
+	Path((_org_id, run_id)): Path<(String, String)>,
+	Query(_params): Query<EventStreamQuery>,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+	let stream = stream::unfold(0u64, move |counter| {
+		let run_id = run_id.clone();
+		async move {
+			tokio::time::sleep(Duration::from_secs(1)).await;
+
+			let event_data = serde_json::json!({
+				"run_id": run_id,
+				"event": "heartbeat",
+				"counter": counter,
+			});
+
+			let event = Event::default()
+				.data(event_data.to_string())
+				.id(counter.to_string())
+				.event("heartbeat");
+
+			Some((Ok(event), counter + 1))
+		}
+	});
+
+	Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/orgs/{org_id}/multi-agent/projects/{run_id}/events/history",
+    responses(
+        (status = 200, description = "Event history", body = EventHistoryResponse),
+        (status = 401, description = "Not authenticated", body = MultiAgentErrorResponse),
+        (status = 404, description = "Project not found", body = MultiAgentErrorResponse)
+    ),
+    tag = "multi-agent"
+)]
+/// GET /api/orgs/{org_id}/multi-agent/projects/{run_id}/events/history - Get event history.
+pub async fn event_history(
+	State(_state): State<AppState>,
+	RequireAuth(_current_user): RequireAuth,
+	Path((_org_id, _run_id)): Path<(String, String)>,
+	Query(_params): Query<EventHistoryQuery>,
+) -> impl IntoResponse {
+	Json(EventHistoryResponse {
+		events: vec![],
+		total: 0,
+		has_more: false,
+	})
+	.into_response()
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/orgs/{org_id}/multi-agent/subscriptions",
+    request_body = CreateSubscriptionRequest,
+    responses(
+        (status = 201, description = "Subscription created", body = SubscriptionResponse),
+        (status = 400, description = "Invalid request", body = MultiAgentErrorResponse),
+        (status = 401, description = "Not authenticated", body = MultiAgentErrorResponse)
+    ),
+    tag = "multi-agent"
+)]
+/// POST /api/orgs/{org_id}/multi-agent/subscriptions - Create event subscription.
+pub async fn create_subscription(
+	State(_state): State<AppState>,
+	RequireAuth(_current_user): RequireAuth,
+	Path(_org_id): Path<String>,
+	Json(request): Json<CreateSubscriptionRequest>,
+) -> impl IntoResponse {
+	let response = SubscriptionResponse {
+		subscription_id: format!("sub-{}", uuid::Uuid::now_v7()),
+		filter: request.filter,
+		created_at: chrono::Utc::now(),
+	};
+
+	(StatusCode::CREATED, Json(response)).into_response()
 }

@@ -203,3 +203,86 @@ pub struct MultiAgentErrorResponse {
 	pub error: String,
 	pub message: String,
 }
+
+/// Query parameters for SSE event stream.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct EventStreamQuery {
+	/// Filter by event types (comma-separated)
+	pub filter: Option<String>,
+	/// Replay events since this timestamp (ISO 8601)
+	pub since: Option<DateTime<Utc>>,
+}
+
+/// Query parameters for event history.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct EventHistoryQuery {
+	/// Filter by events after this time
+	pub since: Option<DateTime<Utc>>,
+	/// Filter by events before this time
+	pub until: Option<DateTime<Utc>>,
+	/// Filter by event types (comma-separated)
+	pub event_types: Option<String>,
+	/// Filter by planner ID
+	pub planner_id: Option<String>,
+	/// Filter by task ID
+	pub task_id: Option<String>,
+	/// Maximum number of events to return
+	pub limit: Option<u32>,
+	/// Offset for pagination
+	pub offset: Option<u32>,
+}
+
+/// Response for event history.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct EventHistoryResponse {
+	pub events: Vec<TaskEventResponse>,
+	pub total: u64,
+	pub has_more: bool,
+}
+
+/// A task event in API response format.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct TaskEventResponse {
+	pub id: String,
+	pub event_type: String,
+	pub task_id: Option<String>,
+	pub planner_id: Option<String>,
+	pub worker_id: Option<String>,
+	pub data: serde_json::Value,
+	pub timestamp: DateTime<Utc>,
+}
+
+/// Request to create an event subscription.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct CreateSubscriptionRequest {
+	/// Event filter
+	pub filter: EventFilterApi,
+	/// Optional webhook URL for delivery
+	pub webhook_url: Option<String>,
+}
+
+/// Event filter for API requests.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct EventFilterApi {
+	/// Event types to include
+	pub event_types: Option<Vec<String>>,
+	/// Planner IDs to include
+	pub planner_ids: Option<Vec<String>>,
+	/// Task IDs to include
+	pub task_ids: Option<Vec<String>>,
+}
+
+/// Response for subscription creation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
+pub struct SubscriptionResponse {
+	pub subscription_id: String,
+	pub filter: EventFilterApi,
+	pub created_at: DateTime<Utc>,
+}
