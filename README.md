@@ -113,11 +113,22 @@ The multi-agent system enables 10-100+ concurrent agents to work on a single cod
 
 **Crates:**
 - `loom-multi-agent-core` - Core types (Task, Domain, Verdict, etc.)
-- `loom-multi-agent-events` - Event bus for planner wake-up
+- `loom-multi-agent-events` - Event bus, persistence, back-pressure
 - `loom-server-multi-agent` - Repository, task queue, file ownership
 - `loom-multi-agent` - Agent implementations
 
-See [specs/multi-agent-coordination-system.md](specs/multi-agent-coordination-system.md) for the full design.
+#### Task Signaling System
+
+The multi-agent system uses an event-driven task signaling system that enables planners to wake up precisely when tasks complete:
+
+- **Event Persistence** - Events stored in SQLite with buffered writes for performance
+- **Event Replay** - Recovery and catch-up via replay from any timestamp
+- **Back-pressure Control** - Configurable thresholds (warning/critical/maximum) to prevent planner overload
+- **Dependency Resolution** - Automatic cascade notifications when blocking tasks complete
+- **Real-time Streaming** - SSE endpoint for live event subscription
+- **Wake-up Context** - Planners receive rich context including time since last plan, completed task count, and pending tasks
+
+See [specs/task-signaling-system.md](specs/task-signaling-system.md) for the full design.
 
 ## Building
 

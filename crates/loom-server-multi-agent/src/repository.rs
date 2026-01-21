@@ -96,6 +96,7 @@ impl SqliteMultiAgentRepository {
 
 // Database row structs
 #[derive(sqlx::FromRow)]
+#[allow(dead_code)]
 struct ProjectRunRow {
 	id: String,
 	org_id: String,
@@ -963,6 +964,7 @@ impl MultiAgentRepository for SqliteMultiAgentRepository {
 				commit_sha: r.commit_sha,
 				verifications,
 				context_snapshot: Default::default(),
+				unblocked_tasks: Vec::new(),
 			})
 		})
 		.transpose()

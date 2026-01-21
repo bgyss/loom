@@ -17,6 +17,7 @@ use crate::worker::Worker;
 use crate::Result;
 
 /// Handle to a running worker.
+#[allow(dead_code)]
 struct WorkerHandle {
 	worker_id: WorkerId,
 	shutdown_tx: mpsc::Sender<()>,

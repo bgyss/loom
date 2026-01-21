@@ -191,9 +191,6 @@ loom-server-context = { path = "crates/loom-server-context" }
 loom-analytics = { path = "crates/loom-analytics" }
 loom-server-analytics = { path = "crates/loom-server-analytics" }
 loom-common-http = { path = "crates/loom-common-http" }
-loom-context-core = { path = "crates/loom-context-core" }
-loom-context = { path = "crates/loom-context" }
-loom-server-context = { path = "crates/loom-server-context" }
 
 # Build profile optimizations for faster development builds
 [profile.dev]

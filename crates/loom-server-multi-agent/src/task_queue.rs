@@ -8,8 +8,9 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::instrument;
 
+use chrono::Utc;
 use loom_multi_agent_core::{ProjectRunId, Task, TaskCompletion, TaskId, TaskStatus, WorkerId};
-use loom_multi_agent_events::{EventBus, TaskEvent};
+use loom_multi_agent_events::{DependencyResolvedEvent, EventBus, TaskEvent};
 
 use crate::error::Result;
 use crate::repository::MultiAgentRepository;
@@ -139,13 +140,13 @@ impl<R: MultiAgentRepository> TaskQueue<R> {
 
 	/// Complete a task and notify the planner.
 	#[instrument(skip(self, completion), fields(task_id = %completion.task_id))]
-	pub async fn complete(&self, completion: TaskCompletion) -> Result<()> {
+	pub async fn complete(&self, mut completion: TaskCompletion) -> Result<()> {
 		let _guard = self.lock.write().await;
 
 		let task_id = completion.task_id.clone();
 		let worker_id = completion.worker_id.clone();
 
-		let now = chrono::Utc::now();
+		let now = Utc::now();
 		let status = TaskStatus::Completed {
 			completed_at: now,
 			summary: completion.output.summary.clone(),
@@ -156,13 +157,41 @@ impl<R: MultiAgentRepository> TaskQueue<R> {
 		self.repository.clear_worker_task(&worker_id).await?;
 
 		let dependent_tasks = self.repository.get_dependent_tasks(&task_id).await?;
+		let mut unblocked_tasks = Vec::new();
+
 		for dep_task_id in &dependent_tasks {
-			self.repository.remove_task_dependency(dep_task_id, &task_id).await?;
+			self.repository
+				.remove_task_dependency(dep_task_id, &task_id)
+				.await?;
+
+			let remaining_deps = self.repository.get_task_dependencies(dep_task_id).await?;
+			let all_resolved = remaining_deps.is_empty();
+
+			let _ = self.event_bus.publish(TaskEvent::DependencyResolved(
+				DependencyResolvedEvent {
+					task_id: dep_task_id.clone(),
+					dependency_id: task_id.clone(),
+					all_resolved,
+					timestamp: Utc::now(),
+				},
+			));
+
+			if all_resolved {
+				unblocked_tasks.push(dep_task_id.clone());
+			}
 		}
 
-		let _ = self.event_bus.publish(TaskEvent::Completed(Box::new(completion)));
+		completion.unblocked_tasks = unblocked_tasks.clone();
 
-		tracing::info!(%task_id, "Task completed, {} dependent tasks unblocked", dependent_tasks.len());
+		let _ = self
+			.event_bus
+			.publish(TaskEvent::Completed(Box::new(completion)));
+
+		tracing::info!(
+			%task_id,
+			unblocked = unblocked_tasks.len(),
+			"Task completed, dependent tasks unblocked"
+		);
 		Ok(())
 	}
 

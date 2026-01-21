@@ -42,6 +42,7 @@ pub struct Orchestrator<R: MultiAgentRepository> {
 }
 
 /// Handle to a running planner.
+#[allow(dead_code)]
 struct PlannerHandle {
 	planner_id: PlannerId,
 	event_tx: mpsc::Sender<PlannerEvent>,

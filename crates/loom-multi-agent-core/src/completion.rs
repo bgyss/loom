@@ -33,6 +33,9 @@ pub struct TaskCompletion {
 	pub verifications: Vec<VerificationResult>,
 	/// Context at completion (for planner wake-up)
 	pub context_snapshot: ContextSnapshot,
+	/// Tasks that were unblocked by this completion
+	#[serde(default)]
+	pub unblocked_tasks: Vec<TaskId>,
 }
 
 /// Output produced by completing a task.

@@ -262,6 +262,9 @@ pub struct ContextItem {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct ContextSnapshot {
+	/// Planner ID that created this context
+	#[serde(default)]
+	pub planner_id: PlannerId,
 	/// Context items
 	pub items: Vec<ContextItem>,
 	/// Git commit SHA at snapshot time

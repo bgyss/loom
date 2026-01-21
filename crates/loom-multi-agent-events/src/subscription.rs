@@ -42,6 +42,7 @@ pub enum EventType {
 	Failed,
 	Cancelled,
 	NeedsIteration,
+	DependencyResolved,
 }
 
 impl EventFilter {
@@ -81,6 +82,7 @@ impl EventFilter {
 					TaskEvent::Failed { .. } => EventType::Failed,
 					TaskEvent::Cancelled { .. } => EventType::Cancelled,
 					TaskEvent::NeedsIteration { .. } => EventType::NeedsIteration,
+					TaskEvent::DependencyResolved(_) => EventType::DependencyResolved,
 				};
 				types.contains(&event_type)
 			}

@@ -3,7 +3,7 @@
 
 //! File ownership manager for conflict prevention.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use chrono::Utc;
 use sqlx::SqlitePool;
@@ -180,7 +180,7 @@ impl FileOwnershipManager {
 
 	/// Get the owner of a file.
 	#[instrument(skip(self), fields(file = %file.display()))]
-	pub async fn get_owner(&self, file: &PathBuf) -> Result<Option<WorkerId>> {
+	pub async fn get_owner(&self, file: &Path) -> Result<Option<WorkerId>> {
 		let file_path = file.to_string_lossy();
 		let row: Option<(String,)> = sqlx::query_as(
 			r#"
